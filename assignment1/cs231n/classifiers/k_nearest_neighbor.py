@@ -1,4 +1,7 @@
 import numpy as np
+import math
+import matplotlib.pyplot as plt
+
 
 class KNearestNeighbor(object):
   """ a kNN classifier with L2 distance """
@@ -71,7 +74,12 @@ class KNearestNeighbor(object):
         # training point, and store the result in dists[i, j]. You should   #
         # not use a loop over dimension.                                    #
         #####################################################################
-        pass
+        # We strictly stick to the instructions, hence the answer below.
+        # Though the sqrt() is not needed for Nearest Neighbors (as sqrt is
+        # monotonous and does not change the ordering of the distances). This
+        # is interesting as sqrt is costly.
+        diff = X[i, :] - self.X_train[j, :]
+        dists[i, j] = math.sqrt(diff.dot(diff))
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -93,7 +101,9 @@ class KNearestNeighbor(object):
       # Compute the l2 distance between the ith test point and all training #
       # points, and store the result in dists[i, :].                        #
       #######################################################################
-      pass
+      diff = (self.X_train - X[i, :])
+      sqDist = np.sum(diff ** 2, 1)
+      dists[i, :] = np.sqrt(sqDist)
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
@@ -121,7 +131,10 @@ class KNearestNeighbor(object):
     # HINT: Try to formulate the l2 distance using matrix multiplication    #
     #       and two broadcast sums.                                         #
     #########################################################################
-    pass
+    XTrainSq = np.sum(self.X_train * self.X_train, 1)
+    XTestSq  = np.sum(X * X, 1)[None].T
+    XTrainXTest = -2.0 * X.dot(self.X_train.T)
+    dists = np.sqrt(XTrainXTest + XTrainSq + XTestSq)
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################
@@ -153,7 +166,15 @@ class KNearestNeighbor(object):
       # neighbors. Store these labels in closest_y.                           #
       # Hint: Look up the function numpy.argsort.                             #
       #########################################################################
-      pass
+      distancesToTestImg_i = dists[i, :]
+      sortedTrainImgIdx = np.argsort(distancesToTestImg_i)
+      closestTrainImgIdx = sortedTrainImgIdx[0:k]
+      closest_y = closestTrainImgIdx
+
+      # print closest_y
+      # print dists[i, closest_y]
+      # plt.plot(dists[i, :])
+      # plt.show()
       #########################################################################
       # TODO:                                                                 #
       # Now that you have found the labels of the k nearest neighbors, you    #
@@ -161,7 +182,10 @@ class KNearestNeighbor(object):
       # Store this label in y_pred[i]. Break ties by choosing the smaller     #
       # label.                                                                #
       #########################################################################
-      pass
+      closestTrainImgCat = self.y_train[closest_y]
+      CatBins = np.bincount(closestTrainImgCat)
+      maxCatBin = np.argmax(CatBins)
+      y_pred[i] = maxCatBin
       #########################################################################
       #                           END OF YOUR CODE                            # 
       #########################################################################
