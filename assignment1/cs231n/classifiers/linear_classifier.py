@@ -49,7 +49,12 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      batchIdx = np.random.choice(num_train - 1, batch_size)
+      X_batch = X[batchIdx]
+      y_batch = y[batchIdx]
+
+      # print "X_batch.shape : ", X_batch.shape
+      # print "y_batch : ", y_batch
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -63,7 +68,7 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      self.W -= learning_rate * grad
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -79,7 +84,7 @@ class LinearClassifier(object):
     data points.
 
     Inputs:
-    - X: D x N array of training data. Each column is a D-dimensional point.
+    - X: N x D array of training data. Each row is a D-dimensional point.
 
     Returns:
     - y_pred: Predicted labels for the data in X. y_pred is a 1-dimensional
@@ -91,7 +96,13 @@ class LinearClassifier(object):
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    scores = X.dot(self.W)
+    y_pred = np.argmax(scores, 1)
+
+    # print "X.shape : ",      X.shape
+    # print "self.W.shape : ", self.W.shape
+    # print "scores.shape : ", scores.shape
+    # print "y_pred.shape : ", y_pred.shape
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
@@ -112,7 +123,7 @@ class LinearClassifier(object):
     - loss as a single float
     - gradient with respect to self.W; an array of the same shape as W
     """
-    pass
+    return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
 
 
 class LinearSVM(LinearClassifier):
